@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
-//Класс для выполнения команд. Не забудь, что команды execute_script и save за тобой!!!
 public class Commands {
     static LinkedHashSet<MusicBand> set=new LinkedHashSet<MusicBand>();//сама коллекция
     static String[] history=new String[6];//массив для хранения истории команд
@@ -33,7 +32,7 @@ public class Commands {
                 "history : вывести последние 6 команд (без их аргументов)\n"+
                 "min_by_albums_count : вывести любой объект из коллекции, значение поля albumsCount которого является минимальным\n"+
                 "count_greater_than_genre genre : вывести количество элементов, значение поля genre которых больше заданного. Жанры:RAP, POST_ROCK, BRIT_POP\n"+
-                "print_ascending : вывести элементы коллекции в порядке возрастания)\n");
+                "print_ascending : вывести элементы коллекции в порядке возрастания\n");
         Operations.HistoryChange("help");
     }
     public static void info(){
@@ -84,6 +83,9 @@ public class Commands {
         Operations.HistoryChange("clear");
     }
     public static void save(){
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Введите файл, в который необходимо сохарнить коллекцию");
+        String file_path = sc.nextLine();
         JSONArray toFile = new JSONArray();
         for (MusicBand tempBand : set) {
             JSONObject toJson = new JSONObject();
@@ -104,7 +106,7 @@ public class Commands {
             }
         }
         try{
-            File file = new File("D:\\test");
+            File file = new File(file_path);
             PrintWriter writer = new PrintWriter(file);
             writer.print("");
             writer.close();
@@ -158,7 +160,7 @@ public class Commands {
                             }
                             break;
                         case "add":
-                            if (tempStrArray[tempStrArray.length-1].equals("add")){//случай, когда нет параметра там, где он нужен
+                            if (tempStrArray[tempStrArray.length-1].equals("add")){
                                 System.out.println("А что добавлять?");
                             }
                             else{

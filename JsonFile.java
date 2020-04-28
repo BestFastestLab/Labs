@@ -7,12 +7,15 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Scanner;
 
 public class JsonFile {
-    FileInputStream fileInputStream = new FileInputStream("D:\\test");
+    Scanner scanner = new Scanner(System.in);
+    public String JsonFilePath = scanner.nextLine();
+    FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
     BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
     byte[] text = bufferedInputStream.readAllBytes();
-    String TEXT = new String(text);
+    String TEXT = new String(text); 
     private JSONParser jsonParser = new JSONParser();
 
     public JsonFile() throws IOException {
@@ -21,13 +24,12 @@ public class JsonFile {
     public Integer getJsonCollectionSize() {
         int counter = 0;
         try {
-            System.out.println(TEXT);
             JSONArray jsonArray = (JSONArray) jsonParser.parse(TEXT);
             for (Object obj : jsonArray) {
                 counter++;
             }
         } catch (ParseException ex) {
-            System.out.println(ex);;
+            System.out.println(ex);
         }
         return counter;
     }

@@ -1,12 +1,10 @@
 import java.io.IOException;
 import java.util.Scanner;
-/*Я понимаю, что разбираться в чужом коде-это пздц, так что тут будет немного комментов)
-Мейновский класс у нас будет отвечать за пользовательский ввод и за работу системы в целом
-обработку ввода команды execute_script оставляю за тобой
- */
+
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        System.out.println("Введите файл с которого нужно считать коллекцию");
         Commands commands = new Commands();
         Scanner sc=new Scanner(System.in);
         System.out.println("Введите команду или help для получения списка доступных команд");
