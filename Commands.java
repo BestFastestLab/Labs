@@ -14,6 +14,9 @@ public class Commands {
 
     public Commands() throws IOException {
         set.addAll(FileObject());
+        /**
+         * Добавление коллекции
+         */
     }
 
     public static void help(){
@@ -312,6 +315,10 @@ public class Commands {
         Operations.HistoryChange("print_ascending");
 
     }
+
+    /**
+     * @return возвращает коллекцию полученную из файла.
+     */
     public List<MusicBand> FileObject(){
         List<MusicBand> FileBand = new LinkedList<MusicBand>();
         for (int counter = 0; counter < jsonFile.getJsonCollectionSize(); counter++){

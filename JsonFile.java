@@ -10,15 +10,47 @@ import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class JsonFile {
+    /**
+     * Получаем путь к файлу
+     */
     Scanner scanner = new Scanner(System.in);
     public String JsonFilePath = scanner.nextLine();
-    FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
-    BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
-    byte[] text = bufferedInputStream.readAllBytes();
-    String TEXT = new String(text); 
+    /**
+     * @param TEXT содержит текст из файла.
+     */
+    String TEXT = new String(getCharArray());
     private JSONParser jsonParser = new JSONParser();
 
     public JsonFile() throws IOException {
+    }
+
+    /**
+     * @return возвращает количество элементов в файле.
+     * @throws IOException
+     */
+
+    public int BufferedInputStreamCounter() throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
+        int counter = 0;
+        while (bufferedInputStream.read() != -1 ){
+            counter++;
+        }
+        return counter;
+    }
+
+    /**
+     * @return получаем массив char, который состоит из символов из файла.
+     * @throws IOException
+     */
+    public char[] getCharArray() throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
+        char [] temp_array = new char[BufferedInputStreamCounter()];
+        for (int i = 0; i != BufferedInputStreamCounter(); i++){
+            temp_array[i] = (char) bufferedInputStream.read();
+        }
+        return temp_array;
     }
 
     public Integer getJsonCollectionSize() {
@@ -33,6 +65,12 @@ public class JsonFile {
         }
         return counter;
     }
+
+    /**
+     * Последующие методы необходима для считывания параметров коллекции
+     * @param index
+     * @return возращает параметр коллекции (имя, id, координаты и т.д.)
+     */
 
     public String getName(int index) {
         String tempName = null;

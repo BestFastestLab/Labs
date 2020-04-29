@@ -103,6 +103,7 @@ public  class Operations {
                 Scanner scanner=new Scanner(System.in);
                 y=scanner.nextLong();
                 metka=false;
+
             }
             catch (Exception e){
                 System.out.println("Это не число, либо число не из допустимого интервала значаений, попробуйте еще раз!");
