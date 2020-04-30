@@ -3,8 +3,11 @@ import java.util.Scanner;
 
 public class Main {
 
+
+    public static String JsonFilePath;
+
     public static void main(String[] args) throws IOException {
-        System.out.println("Введите файл с которого нужно считать коллекцию");
+        JsonFilePath = args[0];
         Commands commands = new Commands();
         Scanner sc=new Scanner(System.in);
         System.out.println("Введите команду или help для получения списка доступных команд");

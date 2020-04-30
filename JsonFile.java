@@ -7,14 +7,12 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Scanner;
 
 public class JsonFile {
     /**
      * Получаем путь к файлу
      */
-    Scanner scanner = new Scanner(System.in);
-    public String JsonFilePath = scanner.nextLine();
+    public String JsonFilePath = Main.JsonFilePath;
     /**
      * @param TEXT содержит текст из файла.
      */

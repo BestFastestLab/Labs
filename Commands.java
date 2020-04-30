@@ -8,15 +8,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Commands {
-    static LinkedHashSet<MusicBand> set=new LinkedHashSet<MusicBand>();//сама коллекция
+    static LinkedHashSet<MusicBand> set= new LinkedHashSet<>();//сама коллекция
     static String[] history=new String[6];//массив для хранения истории команд
     JsonFile jsonFile = new JsonFile();
 
     public Commands() throws IOException {
         set.addAll(FileObject());
-        /**
-         * Добавление коллекции
-         */
     }
 
     public static void help(){
@@ -85,10 +82,8 @@ public class Commands {
         set.clear();
         Operations.HistoryChange("clear");
     }
-    public static void save(){
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Введите файл, в который необходимо сохарнить коллекцию");
-        String file_path = sc.nextLine();
+    @SuppressWarnings("unchecked") public static void save(){
+        String file_path = Main.JsonFilePath;
         JSONArray toFile = new JSONArray();
         for (MusicBand tempBand : set) {
             JSONObject toJson = new JSONObject();
@@ -117,8 +112,6 @@ public class Commands {
             outputStream.write(toFile.toJSONString().getBytes());
             outputStream.flush();
             outputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -143,7 +136,6 @@ public class Commands {
             while (scanner.hasNext()){
                 try{
                     long k = 0;
-                    int counter = 0;
                     String tempStr = scanner.nextLine();
                     String[] tempStrArray = tempStr.split("\\s");
                     String comparison = tempStrArray[0];
@@ -320,7 +312,7 @@ public class Commands {
      * @return возвращает коллекцию полученную из файла.
      */
     public List<MusicBand> FileObject(){
-        List<MusicBand> FileBand = new LinkedList<MusicBand>();
+        List<MusicBand> FileBand = new LinkedList<>();
         for (int counter = 0; counter < jsonFile.getJsonCollectionSize(); counter++){
             MusicBand tempBand = new MusicBand();
             tempBand.setName(jsonFile.getName(counter));
