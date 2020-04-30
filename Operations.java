@@ -1,8 +1,13 @@
-import java.util.Scanner;
-
-public  class Operations {
-    static boolean sorted=false;//Переменная, показывающая, отсортирована ли коллекция
-
+import java.util.*;
+import java.time.LocalDate;
+public class Operations {
+    /**
+     * @value sorted-Переменная, показывающая, отсортирована ли коллекция
+     */
+    static boolean sorted=false;
+    /**
+     * @return Проверка существования объекта с заданным id
+     */
     public static boolean Existence(long id) {//Проверка существования объекта с заданным id в коллекции. Нужен для команды uptade_id
         boolean k = false;
         for (MusicBand band:Commands.set) {
@@ -13,12 +18,18 @@ public  class Operations {
         }
         return k;
     }
+    /**
+     * Формирование истории введенных команд
+     */
     public static void HistoryChange(String NewCommand){//формирование истории запросов
         for (int i=0; i<5; i++){
             Commands.history[i]=Commands.history[i+1];
         }
         Commands.history[5]=NewCommand;
     }
+    /**
+     * Сортировка коллекции
+     */
     public static void SortSet(){//сортировка коллекции
         if(!sorted){
             MusicBand[] bands=Commands.set.toArray(new MusicBand[Commands.set.size()]);
@@ -43,13 +54,19 @@ public  class Operations {
             sorted=true;
         }
     }
+    /**
+     * @return Выявление наибольшего объекта
+     */
     public static MusicBand GetMax(){
         Operations.SortSet();
-        MusicBand[] bands=  Commands.set.toArray(new MusicBand[Commands.set.size()]);
+        MusicBand[] bands= Commands.set.toArray(new MusicBand[Commands.set.size()]);
         return bands[bands.length-1];
     }
+    /**
+     * @return Выявление объекта с наименьшим полем AlbumCount
+     */
     public static MusicBand GetMinAlbumCount(){
-        MusicBand[] bands=  Commands.set.toArray(new MusicBand[Commands.set.size()]);
+        MusicBand[] bands= Commands.set.toArray(new MusicBand[Commands.set.size()]);
         MusicBand p=bands[0];
         for (int i=1; i<bands.length; i++) {
             if(bands[i].getAlbumsCount()<bands[i-1].getAlbumsCount()){
@@ -58,6 +75,9 @@ public  class Operations {
         }
         return p;
     }
+    /**
+     * @return Определение количества жанров, больших заданного с помощью кода
+     */
     public static int GetQuantityGenres(int code){
         int Quantity=0;
         if(code<2){
@@ -70,6 +90,9 @@ public  class Operations {
         }
         return Quantity;
     }
+    /**
+     * @return Создание нового объекта
+     */
     public static MusicBand CreatingNewBand(String name){
         MusicBand band=new MusicBand();
         Coordinates coordinates=new Coordinates();
@@ -77,7 +100,7 @@ public  class Operations {
         do{
             band.setId((int) (Math.random()*Integer.MAX_VALUE));
         } while(Existence(band.getId()));
-        System.out.println("Введите координату x(число, большее -775, но меньшее )"+Double.MAX_VALUE);
+        System.out.println("Введите координату x(число, большее -775, но меньшее "+Double.MAX_VALUE+")");
         double x=0.0;
         boolean metka=true;
         while(metka){
@@ -198,6 +221,7 @@ public  class Operations {
         String nameOfBestAlbum=scanner.nextLine();
         Album bestAlbum=new Album(nameOfBestAlbum, length);
         band.setBestAlbum(bestAlbum);
+        band.setCreationDate(LocalDate.of((int) (Math.random()*2021),(int) (Math.random()*13), (int) (Math.random()*29)));
         return band;
     }
     public static void removing_greater(MusicBand targetBand){

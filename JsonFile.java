@@ -3,9 +3,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 
 public class JsonFile {
@@ -14,7 +12,7 @@ public class JsonFile {
      */
     public String JsonFilePath = Main.JsonFilePath;
     /**
-     * @param TEXT содержит текст из файла.
+     TEXT содержит текст из файла.
      */
     String TEXT = new String(getCharArray());
     private JSONParser jsonParser = new JSONParser();
@@ -42,6 +40,13 @@ public class JsonFile {
      * @throws IOException
      */
     public char[] getCharArray() throws IOException {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
+        }
+        catch (Exception e){
+            System.out.println("Файла не существует или нет прав на чтение");
+            System.exit(0);
+        }
         FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
         BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
         char [] temp_array = new char[BufferedInputStreamCounter()];

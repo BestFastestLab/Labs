@@ -82,7 +82,7 @@ public class Commands {
         set.clear();
         Operations.HistoryChange("clear");
     }
-    @SuppressWarnings("unchecked") public static void save(){
+        @SuppressWarnings("unchecked") public static void save(){
         String file_path = Main.JsonFilePath;
         JSONArray toFile = new JSONArray();
         for (MusicBand tempBand : set) {
@@ -99,7 +99,8 @@ public class Commands {
                 toJson.put("bestAlbum name", tempBand.getBestAlbum().getName());
                 toJson.put("bestAlbum length", tempBand.getBestAlbum().getLength());
                 toFile.add(toJson);
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 System.out.println("Одно из полей не заполнено");
             }
         }
