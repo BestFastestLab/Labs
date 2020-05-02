@@ -13,7 +13,7 @@ public class Commands {
     JsonFile jsonFile = new JsonFile();
 
     public Commands() throws IOException {
-        set.addAll(FileObject());
+        set.addAll(fileObject());
     }
 
     public static void help(){
@@ -33,24 +33,24 @@ public class Commands {
                 "min_by_albums_count : вывести любой объект из коллекции, значение поля albumsCount которого является минимальным\n"+
                 "count_greater_than_genre genre : вывести количество элементов, значение поля genre которых больше заданного. Жанры:RAP, POST_ROCK, BRIT_POP\n"+
                 "print_ascending : вывести элементы коллекции в порядке возрастания\n");
-        Operations.HistoryChange("help");
+        Operations.historyChange("help");
     }
     public static void info(){
         System.out.println("Тип коллекции: "+set.getClass());
         System.out.println("Размер коллекции: "+set.size());
-        Operations.HistoryChange("info");
+        Operations.historyChange("info");
     }
     public static void show(){
         for (MusicBand band: set) {
             System.out.println(band.toString());
         }
-        Operations.HistoryChange("show");
+        Operations.historyChange("show");
     }
     public static void add(String name){
         Operations.sorted=false;
-        set.add(Operations.CreatingNewBand(name));
+        set.add(Operations.creatingNewBand(name));
         System.out.println("Объект с названием "+name+" успешно добавлен!");
-        Operations.HistoryChange("add");
+        Operations.historyChange("add");
     }
     public static void update_id(long id){
         String name;
@@ -66,7 +66,7 @@ public class Commands {
                 }
             }
         }
-        Operations.HistoryChange("update_id");
+        Operations.historyChange("update_id");
     }
     public static void remove_by_id(long id) {
         for (MusicBand band : set) {
@@ -80,10 +80,10 @@ public class Commands {
 
     public static void clear(){
         set.clear();
-        Operations.HistoryChange("clear");
+        Operations.historyChange("clear");
     }
-        @SuppressWarnings("unchecked") public static void save(){
-        String file_path = Main.JsonFilePath;
+    @SuppressWarnings("unchecked") public static void save(){
+        String file_path = Main.getJsonFilePath();
         JSONArray toFile = new JSONArray();
         for (MusicBand tempBand : set) {
             JSONObject toJson = new JSONObject();
@@ -99,8 +99,7 @@ public class Commands {
                 toJson.put("bestAlbum name", tempBand.getBestAlbum().getName());
                 toJson.put("bestAlbum length", tempBand.getBestAlbum().getLength());
                 toFile.add(toJson);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.out.println("Одно из полей не заполнено");
             }
         }
@@ -116,7 +115,7 @@ public class Commands {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Operations.HistoryChange("save");
+        Operations.historyChange("save");
     }
     public static void execute_script(String file){
         File script_file = new File(file);
@@ -174,7 +173,7 @@ public class Commands {
                                 catch (Exception e){
                                     System.out.println("Попробуйте еще раз ввести команду, используя число в качесте id");
                                 }
-                                if(Operations.Existence(k)){
+                                if(Operations.existence(k)){
                                     Commands.update_id(k);
                                 }
                                 else{
@@ -193,7 +192,7 @@ public class Commands {
                                 catch (Exception e){
                                     System.out.println("Попробуйте еще раз ввести команду, используя число в качесте id");
                                 }
-                                if(Operations.Existence(k)){
+                                if(Operations.existence(k)){
                                     Commands.remove_by_id(k);
                                 }
                                 else{
@@ -240,7 +239,7 @@ public class Commands {
                                 System.out.println("А с чем сравнивать?");
                             }
                             else{
-                                if(MusicGenre.Existence(tempStrArray[tempStrArray.length-1])){
+                                if(MusicGenre.existence(tempStrArray[tempStrArray.length-1])){
                                     System.out.println(Commands.count_greater_than_genre(MusicGenre.valueOf(tempStrArray[tempStrArray.length-1])));
                                 }
                             }
@@ -258,15 +257,15 @@ public class Commands {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        Operations.HistoryChange("execute_script");
+        Operations.historyChange("execute_script");
     }
     public static void exit(){
         System.exit(0);
-        Operations.HistoryChange("exit");
+        Operations.historyChange("exit");
     }
     public static void add_if_max(String name){
-        MusicBand t=Operations.GetMax();
-        MusicBand p=Operations.CreatingNewBand(name);
+        MusicBand t=Operations.getMax();
+        MusicBand p=Operations.creatingNewBand(name);
         if(set.size()>0) {
             if (p.compareTo(t) > 0) {
                 set.add(p);
@@ -280,11 +279,11 @@ public class Commands {
             set.add(p);
             System.out.println("Элемент с названием "+name+" успешно добавлен");
         }
-        Operations.HistoryChange("add_if_max");
+        Operations.historyChange("add_if_max");
     }
     public static void remove_greater(String name){
-        Operations.removing_greater(Operations.CreatingNewBand(name));
-        Operations.HistoryChange("remove_greater");
+        Operations.removing_greater(Operations.creatingNewBand(name));
+        Operations.historyChange("remove_greater");
     }
     public static void history(){
         for (String command:history) {
@@ -292,27 +291,27 @@ public class Commands {
                 System.out.println(command);
             }
         }
-        Operations.HistoryChange("history");
+        Operations.historyChange("history");
     }
     public static void min_by_albums_count(){
-        System.out.println(Operations.GetMinAlbumCount());
-        Operations.HistoryChange("min_by_albums_count");
+        System.out.println(Operations.getMinAlbumCount());
+        Operations.historyChange("min_by_albums_count");
     }
     public static int count_greater_than_genre(MusicGenre genre){
-        Operations.HistoryChange("count_greater_than_genre");
-        return Operations.GetQuantityGenres(genre.ordinal());
+        Operations.historyChange("count_greater_than_genre");
+        return Operations.getQuantityGenres(genre.ordinal());
     }
     public static void print_ascending(){
-        Operations.SortSet();
+        Operations.sortSet();
         show();
-        Operations.HistoryChange("print_ascending");
+        Operations.historyChange("print_ascending");
 
     }
 
     /**
      * @return возвращает коллекцию полученную из файла.
      */
-    public List<MusicBand> FileObject(){
+    public List<MusicBand> fileObject(){
         List<MusicBand> FileBand = new LinkedList<>();
         for (int counter = 0; counter < jsonFile.getJsonCollectionSize(); counter++){
             MusicBand tempBand = new MusicBand();

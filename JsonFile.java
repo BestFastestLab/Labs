@@ -10,9 +10,9 @@ public class JsonFile {
     /**
      * Получаем путь к файлу
      */
-    public String JsonFilePath = Main.JsonFilePath;
+    public String jsonFilePath = Main.getJsonFilePath();
     /**
-     TEXT содержит текст из файла.
+     * TEXT содержит текст из файла.
      */
     String TEXT = new String(getCharArray());
     private JSONParser jsonParser = new JSONParser();
@@ -25,11 +25,11 @@ public class JsonFile {
      * @throws IOException
      */
 
-    public int BufferedInputStreamCounter() throws IOException {
-        FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
+    public int bufferedInputStreamCounter() throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(jsonFilePath);
         BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
         int counter = 0;
-        while (bufferedInputStream.read() != -1 ){
+        while (bufferedInputStream.read() != -1) {
             counter++;
         }
         return counter;
@@ -41,16 +41,15 @@ public class JsonFile {
      */
     public char[] getCharArray() throws IOException {
         try {
-            FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
-        }
-        catch (Exception e){
-            System.out.println("Файла не существует или нет прав на чтение");
+            FileInputStream fileInputStream = new FileInputStream(jsonFilePath);
+        } catch (Exception e) {
+            System.out.println("Указано неправильное имя файла");
             System.exit(0);
         }
-        FileInputStream fileInputStream = new FileInputStream(JsonFilePath);
+        FileInputStream fileInputStream = new FileInputStream(jsonFilePath);
         BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
-        char [] temp_array = new char[BufferedInputStreamCounter()];
-        for (int i = 0; i != BufferedInputStreamCounter(); i++){
+        char[] temp_array = new char[bufferedInputStreamCounter()];
+        for (int i = 0; i != bufferedInputStreamCounter(); i++) {
             temp_array[i] = (char) bufferedInputStream.read();
         }
         return temp_array;
@@ -71,6 +70,7 @@ public class JsonFile {
 
     /**
      * Последующие методы необходима для считывания параметров коллекции
+     *
      * @param index
      * @return возращает параметр коллекции (имя, id, координаты и т.д.)
      */
@@ -149,7 +149,8 @@ public class JsonFile {
             JSONArray jsonArray = (JSONArray) jsonParser.parse(TEXT);
             JSONObject jsonObject = (JSONObject) jsonArray.get(index);
             tempName = ((String) jsonObject.get("bestAlbum name"));
-            tempLength = BigDecimal.valueOf((Long) jsonObject.get("bestAlbum length")).intValue();;
+            tempLength = BigDecimal.valueOf((Long) jsonObject.get("bestAlbum length")).intValue();
+            ;
         } catch (ParseException pe) {
             System.err.println(pe);
         }
@@ -181,7 +182,8 @@ public class JsonFile {
         }
         return tempCount;
     }
-    public Long getAlbumCount ( int index){
+
+    public Long getAlbumCount(int index) {
         long tempCount = 0;
         try {
             JSONArray jsonArray = (JSONArray) jsonParser.parse(TEXT);
