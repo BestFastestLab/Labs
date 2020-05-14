@@ -2,18 +2,25 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Commands {
+    private static LocalDate date;
+    static List<File> tempList;
     static LinkedHashSet<MusicBand> set= new LinkedHashSet<>();//сама коллекция
     static String[] history=new String[6];//массив для хранения истории команд
     JsonFile jsonFile = new JsonFile();
+    {
+        tempList = new LinkedList<>();
+    }
 
     public Commands() throws IOException {
-        set.addAll(FileObject());
+        set.addAll(fileObject());
+        date = LocalDate.now();
     }
 
     public static void help(){
@@ -33,24 +40,25 @@ public class Commands {
                 "min_by_albums_count : вывести любой объект из коллекции, значение поля albumsCount которого является минимальным\n"+
                 "count_greater_than_genre genre : вывести количество элементов, значение поля genre которых больше заданного. Жанры:RAP, POST_ROCK, BRIT_POP\n"+
                 "print_ascending : вывести элементы коллекции в порядке возрастания\n");
-        Operations.HistoryChange("help");
+        Operations.historyChange("help");
     }
     public static void info(){
         System.out.println("Тип коллекции: "+set.getClass());
         System.out.println("Размер коллекции: "+set.size());
-        Operations.HistoryChange("info");
+        System.out.println(date);
+        Operations.historyChange("info");
     }
     public static void show(){
         for (MusicBand band: set) {
             System.out.println(band.toString());
         }
-        Operations.HistoryChange("show");
+        Operations.historyChange("show");
     }
     public static void add(String name){
         Operations.sorted=false;
-        set.add(Operations.CreatingNewBand(name));
+        set.add(Operations.creatingNewBand(name));
         System.out.println("Объект с названием "+name+" успешно добавлен!");
-        Operations.HistoryChange("add");
+        Operations.historyChange("add");
     }
     public static void update_id(long id){
         String name;
@@ -66,7 +74,7 @@ public class Commands {
                 }
             }
         }
-        Operations.HistoryChange("update_id");
+        Operations.historyChange("update_id");
     }
     public static void remove_by_id(long id) {
         for (MusicBand band : set) {
@@ -80,10 +88,10 @@ public class Commands {
 
     public static void clear(){
         set.clear();
-        Operations.HistoryChange("clear");
+        Operations.historyChange("clear");
     }
-        @SuppressWarnings("unchecked") public static void save(){
-        String file_path = Main.JsonFilePath;
+    @SuppressWarnings("unchecked") public static void save(){
+        String file_path = Main.getJsonFilePath();
         JSONArray toFile = new JSONArray();
         for (MusicBand tempBand : set) {
             JSONObject toJson = new JSONObject();
@@ -92,6 +100,7 @@ public class Commands {
                 toJson.put("id", tempBand.getId());
                 toJson.put("coordinate_x", tempBand.getCoordinates().getX());
                 toJson.put("coordinate_y", tempBand.getCoordinates().getY());
+                toJson.put("creationDate", tempBand.getCreationDate().toString());
                 toJson.put("numberOfParticipants", tempBand.getNumberOfParticipants());
                 toJson.put("singlesCount", tempBand.getSinglesCount());
                 toJson.put("albumCount", tempBand.getAlbumsCount());
@@ -99,8 +108,7 @@ public class Commands {
                 toJson.put("bestAlbum name", tempBand.getBestAlbum().getName());
                 toJson.put("bestAlbum length", tempBand.getBestAlbum().getLength());
                 toFile.add(toJson);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.out.println("Одно из полей не заполнено");
             }
         }
@@ -116,157 +124,160 @@ public class Commands {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Operations.HistoryChange("save");
+        Operations.historyChange("save");
     }
     public static void execute_script(String file){
         File script_file = new File(file);
-        try{
-            if (!script_file.exists() || !script_file.isFile()){
-                System.out.println("Файла не существует");
-                return;
-            }
-            if (!script_file.canRead()){
-                System.out.println("Файл не читается");
-                return;
-            }
-            if (script_file.length() == 0){
-                System.out.println("Файл пуст");
-                return;
-            }
-            Scanner scanner = new Scanner(script_file);
-            while (scanner.hasNext()){
-                try{
-                    long k = 0;
-                    String tempStr = scanner.nextLine();
-                    String[] tempStrArray = tempStr.split("\\s");
-                    String comparison = tempStrArray[0];
-                    switch (comparison){
-                        case "help":
-                            Commands.help();
-                            break;
-                        case "info":
-                            Commands.info();
-                            break;
-                        case "show":
-                            if(!Commands.set.isEmpty()) {
-                                Commands.show();
-                            }
-                            else{
-                                System.out.println("Коллекция пуста :(");
-                            }
-                            break;
-                        case "add":
-                            if (tempStrArray[tempStrArray.length-1].equals("add")){
-                                System.out.println("А что добавлять?");
-                            }
-                            else{
-                                Commands.add(tempStrArray[tempStrArray.length-1]);
-                            }
-                            break;
-                        case "update":
-                            if (tempStrArray[tempStrArray.length-1].equals("update")) {
-                                System.out.println("А что обновлять?");
-                            }
-                            else{
-                                try {
-                                    k=Long.parseLong(tempStrArray[tempStrArray.length-1]);
-                                }
-                                catch (Exception e){
-                                    System.out.println("Попробуйте еще раз ввести команду, используя число в качесте id");
-                                }
-                                if(Operations.Existence(k)){
-                                    Commands.update_id(k);
+        if (tempList.lastIndexOf(script_file) == -1) {
+            tempList.add(script_file);
+            try{
+                if (!script_file.exists() || !script_file.isFile()){
+                    System.out.println("Файла не существует");
+                    return;
+                }
+                if (!script_file.canRead()){
+                    System.out.println("Файл не читается");
+                    return;
+                }
+                if (script_file.length() == 0){
+                    System.out.println("Файл пуст");
+                    return;
+                }
+                Scanner scanner = new Scanner(script_file);
+                while (scanner.hasNext()){
+                    try{
+                        long k = 0;
+                        String tempStr = scanner.nextLine();
+                        String[] tempStrArray = tempStr.split("\\s");
+                        String comparison = tempStrArray[0];
+                        switch (comparison){
+                            case "help":
+                                Commands.help();
+                                break;
+                            case "info":
+                                Commands.info();
+                                break;
+                            case "show":
+                                if(!Commands.set.isEmpty()) {
+                                    Commands.show();
                                 }
                                 else{
-                                    System.out.println("Объекта с данным id не существует");
+                                    System.out.println("Коллекция пуста :(");
                                 }
-                            }
-                            break;
-                        case "remove_by_id":
-                            if (tempStrArray[tempStrArray.length-1].equals("update")) {
-                                System.out.println("А что обновлять?");
-                            }
-                            else{
-                                try {
-                                    k=Long.parseLong(tempStrArray[tempStrArray.length-1]);
-                                }
-                                catch (Exception e){
-                                    System.out.println("Попробуйте еще раз ввести команду, используя число в качесте id");
-                                }
-                                if(Operations.Existence(k)){
-                                    Commands.remove_by_id(k);
+                                break;
+                            case "add":
+                                if (tempStrArray[tempStrArray.length-1].equals("add")){
+                                    System.out.println("А что добавлять?");
                                 }
                                 else{
-                                    System.out.println("Объекта с данным id не существует");
+                                    Commands.add(tempStrArray[tempStrArray.length-1]);
                                 }
-                            }
-                            break;
-
-                        case "clear":
+                                break;
+                            case "update":
+                                if (tempStrArray[tempStrArray.length-1].equals("update")) {
+                                    System.out.println("А что обновлять?");
+                                }
+                                else{
+                                    try {
+                                        k=Long.parseLong(tempStrArray[tempStrArray.length-1]);
+                                    }
+                                    catch (Exception e){
+                                        System.out.println("Попробуйте еще раз ввести команду, используя число в качесте id");
+                                    }
+                                    if(Operations.existence(k)){
+                                        Commands.update_id(k);
+                                    }
+                                    else{
+                                        System.out.println("Объекта с данным id не существует");
+                                    }
+                                }
+                                break;
+                            case "remove_by_id":
+                                if (tempStrArray[tempStrArray.length-1].equals("update")) {
+                                    System.out.println("А что обновлять?");
+                                }
+                                else{
+                                    try {
+                                        k=Long.parseLong(tempStrArray[tempStrArray.length-1]);
+                                    }
+                                    catch (Exception e){
+                                        System.out.println("Попробуйте еще раз ввести команду, используя число в качесте id");
+                                    }
+                                    if(Operations.existence(k)){
+                                        Commands.remove_by_id(k);
+                                    }
+                                    else{
+                                        System.out.println("Объекта с данным id не существует");
+                                    }
+                                }
+                                break;
+                            case "clear":
                             Commands.clear();
                             break;
-                        case "save" :
-                            Commands.save();
-                            break;
-                        case "execute_script":
-                            Commands.execute_script(tempStrArray[tempStrArray.length-1]);
-                            break;
-                        case "exit":
-                            Commands.exit();
-                        case "add_if_max":
-                            if (tempStrArray[tempStrArray.length-1].equals("add_if_max")) {
-                                System.out.println("А что добавлять?");
-                            }
-                            else{
-                                Commands.add_if_max(tempStrArray[tempStrArray.length-1]);
-                            }
-                            break;
-                        case "remove_greater":
-                            if (tempStrArray[tempStrArray.length-1].equals("remove_greater")) {
-                                System.out.println("А что удалять?");
-                            }
-                            else{
-                                Commands.remove_greater(tempStrArray[tempStrArray.length-1]);
-                            }
-                            break;
-                        case "history":
-                            Commands.history();
-                            break;
-                        case "min_by_albums_count":
-                            Commands.min_by_albums_count();
-                            break;
-                        case "count_greater_than_genre":
-                            if (tempStrArray[tempStrArray.length-1].equals("count_greater_than_genre")) {
-                                System.out.println("А с чем сравнивать?");
-                            }
-                            else{
-                                if(MusicGenre.Existence(tempStrArray[tempStrArray.length-1])){
-                                    System.out.println(Commands.count_greater_than_genre(MusicGenre.valueOf(tempStrArray[tempStrArray.length-1])));
+                            case "save" :
+                                Commands.save();
+                                break;
+                            case "execute_script":
+                                Commands.execute_script(tempStrArray[tempStrArray.length-1]);
+                                break;
+                            case "exit":
+                                Commands.exit();
+                            case "add_if_max":
+                                if (tempStrArray[tempStrArray.length-1].equals("add_if_max")) {
+                                    System.out.println("А что добавлять?");
                                 }
-                            }
-                            break;
-                        case "print_ascending":
-                            Commands.print_ascending();
-                            break;
-                        default:
-                            System.out.println("Введенная вами команда не соответстувет требованиям. Попробуйте еще раз");
+                                else{
+                                    Commands.add_if_max(tempStrArray[tempStrArray.length-1]);
+                                }
+                                break;
+                            case "remove_greater":
+                                if (tempStrArray[tempStrArray.length-1].equals("remove_greater")) {
+                                    System.out.println("А что удалять?");
+                                }
+                                else{
+                                    Commands.remove_greater(tempStrArray[tempStrArray.length-1]);
+                                }
+                                break;
+                            case "history":
+                                Commands.history();
+                                break;
+                            case "min_by_albums_count":
+                                Commands.min_by_albums_count();
+                                break;
+                            case "count_greater_than_genre":
+                                if (tempStrArray[tempStrArray.length-1].equals("count_greater_than_genre")) {
+                                    System.out.println("А с чем сравнивать?");
+                                }
+                                else{
+                                    if(MusicGenre.existence(tempStrArray[tempStrArray.length-1])){
+                                        System.out.println(Commands.count_greater_than_genre(MusicGenre.valueOf(tempStrArray[tempStrArray.length-1])));
+                                    }
+                                }
+                                break;
+                            case "print_ascending":
+                                Commands.print_ascending();
+                                break;
+                            default:
+                                System.out.println("Введенная вами команда не соответстувет требованиям. Попробуйте еще раз");
+                        }
+                    } catch (Exception e) {
+                        System.err.println(e);
                     }
-                }catch (Exception e){
-                    System.out.println("Файл не найден");
                 }
+                tempList.remove(0);
+            } catch (Exception e) {
+                System.out.println("Файл не найден!");
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        Operations.HistoryChange("execute_script");
+        } else System.out.println("Обнаружен повторный запуск скрипта");
+        Operations.historyChange("execute_script");
     }
     public static void exit(){
         System.exit(0);
-        Operations.HistoryChange("exit");
+        Operations.historyChange("exit");
     }
     public static void add_if_max(String name){
-        MusicBand t=Operations.GetMax();
-        MusicBand p=Operations.CreatingNewBand(name);
+        MusicBand t=Operations.getMax();
+        MusicBand p=Operations.creatingNewBand(name);
         if(set.size()>0) {
             if (p.compareTo(t) > 0) {
                 set.add(p);
@@ -280,11 +291,11 @@ public class Commands {
             set.add(p);
             System.out.println("Элемент с названием "+name+" успешно добавлен");
         }
-        Operations.HistoryChange("add_if_max");
+        Operations.historyChange("add_if_max");
     }
     public static void remove_greater(String name){
-        Operations.removing_greater(Operations.CreatingNewBand(name));
-        Operations.HistoryChange("remove_greater");
+        Operations.removing_greater(Operations.creatingNewBand(name));
+        Operations.historyChange("remove_greater");
     }
     public static void history(){
         for (String command:history) {
@@ -292,33 +303,34 @@ public class Commands {
                 System.out.println(command);
             }
         }
-        Operations.HistoryChange("history");
+        Operations.historyChange("history");
     }
     public static void min_by_albums_count(){
-        System.out.println(Operations.GetMinAlbumCount());
-        Operations.HistoryChange("min_by_albums_count");
+        System.out.println(Operations.getMinAlbumCount());
+        Operations.historyChange("min_by_albums_count");
     }
     public static int count_greater_than_genre(MusicGenre genre){
-        Operations.HistoryChange("count_greater_than_genre");
-        return Operations.GetQuantityGenres(genre.ordinal());
+        Operations.historyChange("count_greater_than_genre");
+        return Operations.getQuantityGenres(genre.ordinal());
     }
     public static void print_ascending(){
-        Operations.SortSet();
+        Operations.sortSet();
         show();
-        Operations.HistoryChange("print_ascending");
+        Operations.historyChange("print_ascending");
 
     }
 
     /**
      * @return возвращает коллекцию полученную из файла.
      */
-    public List<MusicBand> FileObject(){
+    public List<MusicBand> fileObject(){
         List<MusicBand> FileBand = new LinkedList<>();
         for (int counter = 0; counter < jsonFile.getJsonCollectionSize(); counter++){
             MusicBand tempBand = new MusicBand();
             tempBand.setName(jsonFile.getName(counter));
             tempBand.setId(jsonFile.getId(counter));
             tempBand.setCoordinates(jsonFile.getCoordinates(counter));
+            tempBand.setCreationDate(jsonFile.getCreationDate(counter));
             tempBand.setNumberOfParticipants(jsonFile.getNumberOfParticipants(counter));
             tempBand.setSinglesCount(jsonFile.getSinglesCount(counter));
             tempBand.setAlbumsCount(jsonFile.getAlbumCount(counter));

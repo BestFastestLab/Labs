@@ -1,6 +1,6 @@
 import java.time.LocalDate;
 
-public class MusicBand implements Comparable<MusicBand>  {
+public class MusicBand implements Comparable<MusicBand> {
     private Integer id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
@@ -62,6 +62,7 @@ public class MusicBand implements Comparable<MusicBand>  {
     public void setSinglesCount(Long singlesCount) {
         this.singlesCount = singlesCount;
     }
+
     public Long getSinglesCount() {
         return singlesCount;
     }
@@ -69,7 +70,8 @@ public class MusicBand implements Comparable<MusicBand>  {
     public void setBestAlbum(Album bestAlbum) {
         this.bestAlbum = bestAlbum;
     }
-    public Album getBestAlbum(){
+
+    public Album getBestAlbum() {
         return this.bestAlbum;
     }
 
@@ -80,6 +82,7 @@ public class MusicBand implements Comparable<MusicBand>  {
     public MusicGenre getGenre() {
         return genre;
     }
+
     @Override
     public int compareTo(MusicBand o) {
         return this.numberOfParticipants.compareTo(o.numberOfParticipants);
